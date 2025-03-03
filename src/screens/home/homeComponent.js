@@ -10,7 +10,7 @@ import {
   FlatList,
   Platform,
 } from 'react-native';
-import React from 'react';
+import React, { useCallback } from 'react';
 import Carousel from '../../common/carousel';
 import {banner} from '../../../db/banners';
 import Searchbar from '../../common/searchbar';
@@ -37,6 +37,78 @@ export default function HomeComponent({
 }) {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+
+  const renderCard=useCallback(({item}) => {
+    return (
+      <Pressable
+        onPress={() => {
+          dispatch(setSelectedProduct(item));
+          navigation.navigate({
+            name: 'Product Details',
+          });
+        }}
+        style={{
+          width: 0.45 * width,
+          height: 0.65 * width,
+          marginHorizontal: 10,
+          overflow: 'hidden',
+          backgroundColor: 'white',
+          borderRadius: 10,
+          borderWidth:3,
+          borderColor:colors.card,
+          // shadowOffset:{width:10,height:100},
+          // shadowColor:colors.background,
+          // shadowRadius:100
+        }}>
+        <View style={{width: '100%', height: '60%'}}>
+          <Image
+            style={{flex: 1}}
+            source={{uri: item.category.image}}
+          />
+        </View>
+        <View style={{flex: 1, padding: 10}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}>
+            <Text style={{fontWeight:"700",fontFamily:fontFamily['OpenSans-Medium']}}>
+              {item.brand}
+            </Text>
+            <Text style={{textAlign: 'right',fontWeight:"700",fontFamily:fontFamily['OpenSans-Medium']}}>
+              {config.country.currency.symbol} {item.price}
+              {'\n'}
+              <Text style={{fontSize: 10}}>
+                excl. of tax
+              </Text>
+            </Text>
+          </View>
+          {item.offer && (
+            <View
+              style={{
+                maxWidth: '54%',
+                borderRadius: 10,
+                paddingVertical: 4,
+                paddingHorizontal: 10,
+                marginTop:5,
+                backgroundColor: colors.offers,
+                // flexWrap:'wrap'
+              }}>
+              <Text
+                style={{
+                  fontSize: 10,
+                  maxHeight:40,
+                  color: 'white',
+                }} ellipsizeMode='tail'>
+               {item.offer}
+              </Text>
+            </View>
+          )}
+        </View>
+      </Pressable>
+    );
+  },[])
+  
   return (
     <View style={style.body}>
       <View
@@ -98,76 +170,7 @@ export default function HomeComponent({
             data={products}
             keyExtractor={(item,index)=>{return item.title+index}}
             horizontal
-            renderItem={({item}) => {
-              return (
-                <Pressable
-                  onPress={() => {
-                    dispatch(setSelectedProduct(item));
-                    navigation.navigate({
-                      name: 'Product Details',
-                    });
-                  }}
-                  style={{
-                    width: 0.45 * width,
-                    height: 0.65 * width,
-                    marginHorizontal: 10,
-                    overflow: 'hidden',
-                    backgroundColor: 'white',
-                    borderRadius: 10,
-                    borderWidth:3,
-                    borderColor:colors.card,
-                    // shadowOffset:{width:10,height:100},
-                    // shadowColor:colors.background,
-                    // shadowRadius:100
-                  }}>
-                  <View style={{width: '100%', height: '60%'}}>
-                    <Image
-                      style={{flex: 1}}
-                      source={{uri: item.category.image}}
-                    />
-                  </View>
-                  <View style={{flex: 1, padding: 10}}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                      }}>
-                      <Text style={{fontWeight:"700",fontFamily:fontFamily['OpenSans-Medium']}}>
-                        {item.brand}
-                      </Text>
-                      <Text style={{textAlign: 'right',fontWeight:"700",fontFamily:fontFamily['OpenSans-Medium']}}>
-                        {config.country.currency.symbol} {item.price}
-                        {'\n'}
-                        <Text style={{fontSize: 10}}>
-                          excl. of tax
-                        </Text>
-                      </Text>
-                    </View>
-                    {item.offer && (
-                      <View
-                        style={{
-                          maxWidth: '54%',
-                          borderRadius: 10,
-                          paddingVertical: 4,
-                          paddingHorizontal: 10,
-                          marginTop:5,
-                          backgroundColor: colors.offers,
-                          // flexWrap:'wrap'
-                        }}>
-                        <Text
-                          style={{
-                            fontSize: 10,
-                            maxHeight:40,
-                            color: 'white',
-                          }} ellipsizeMode='tail'>
-                         {item.offer}
-                        </Text>
-                      </View>
-                    )}
-                  </View>
-                </Pressable>
-              );
-            }}
+            renderItem={renderCard}
           />
         )}
       </View>

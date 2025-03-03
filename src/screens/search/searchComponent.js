@@ -9,7 +9,7 @@ import {
     Image,
     FlatList,
   } from 'react-native';
-  import React from 'react';
+  import React, { useCallback } from 'react';
   import Carousel from '../../common/carousel';
   import {banner} from '../../../db/banners';
   import Searchbar from '../../common/searchbar';
@@ -32,6 +32,51 @@ import BackButton from '../../common/backButton';
   }) {
     const navigation = useNavigation();
     const dispatch = useDispatch();
+    const renderCard=useCallback(({item}) => {
+      return (
+        <Pressable
+          onPress={() => {
+            dispatch(setSelectedProduct(item));
+            navigation.navigate({
+              name: 'Product Details',
+            });
+          }}
+          style={{
+            width: 0.35 * width,
+            height: 0.45 * width,
+            marginHorizontal: 10,
+            overflow: 'hidden',
+            backgroundColor: 'white',
+            borderRadius: 10,
+            borderWidth:2,
+            borderColor:colors.secondary,
+            shadowOffset:{width:300,height:200},
+            shadowColor:colors.primary,
+            shadowRadius:100,
+          }}>
+          <View style={{width: '100%', height: '60%'}}>
+            <Image
+              style={{flex: 1}}
+              source={{uri: item.category.image}}
+            />
+          </View>
+          <View style={{flex: 1, padding: 5}}>
+            <View
+              style={{
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}>
+              <Text style={{fontWeight:"400",fontSize:fontSizes.xs}}>
+                {item.title}
+              </Text>
+              <Text style={{fontWeight:"700",fontSize:fontSizes.xs}}>
+                {item.brand}
+              </Text>
+            </View>
+          </View>
+        </Pressable>
+      );
+    },[])
     return (
       <View style={style.body}>
         <View
@@ -60,51 +105,7 @@ import BackButton from '../../common/backButton';
               data={products}
               keyExtractor={(item,index)=>{return item.title+index}}
               numColumns={2}
-              renderItem={({item}) => {
-                return (
-                  <Pressable
-                    onPress={() => {
-                      dispatch(setSelectedProduct(item));
-                      navigation.navigate({
-                        name: 'Product Details',
-                      });
-                    }}
-                    style={{
-                      width: 0.35 * width,
-                      height: 0.45 * width,
-                      marginHorizontal: 10,
-                      overflow: 'hidden',
-                      backgroundColor: 'white',
-                      borderRadius: 10,
-                      borderWidth:2,
-                      borderColor:colors.secondary,
-                      shadowOffset:{width:300,height:200},
-                      shadowColor:colors.primary,
-                      shadowRadius:100,
-                    }}>
-                    <View style={{width: '100%', height: '60%'}}>
-                      <Image
-                        style={{flex: 1}}
-                        source={{uri: item.category.image}}
-                      />
-                    </View>
-                    <View style={{flex: 1, padding: 5}}>
-                      <View
-                        style={{
-                          flexDirection: 'column',
-                          justifyContent: 'space-between',
-                        }}>
-                        <Text style={{fontWeight:"400",fontSize:fontSizes.xs}}>
-                          {item.title}
-                        </Text>
-                        <Text style={{fontWeight:"700",fontSize:fontSizes.xs}}>
-                          {item.brand}
-                        </Text>
-                      </View>
-                    </View>
-                  </Pressable>
-                );
-              }}
+              renderItem={renderCard}
             />
           )}
         </View>

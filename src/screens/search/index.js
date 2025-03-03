@@ -9,10 +9,10 @@ export default function Search() {
   const dipatch=useDispatch()
   const [searchTerm, setSearchTerm] = useState('');
   const products = useSelector((store)=>store.productsSlice.searchProducts)
-  const fetchSearchResults = async (term) => {
+  const fetchSearchResults = (term) => {
         dipatch(searchProducts(term))
   };
-  const debouncedSearch = debounce(fetchSearchResults, 1500);
+  const debouncedSearch = debounce(fetchSearchResults, 2000);
   const handleSearch = (text) => {
     setSearchTerm(text);
     debouncedSearch(text);
